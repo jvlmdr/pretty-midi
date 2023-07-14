@@ -960,7 +960,7 @@ class PrettyMIDI(object):
         synthesized /= np.abs(synthesized).max()
         return synthesized
 
-    def fluidsynth(self, fs=44100, synthesizer=None, sfid=0, sf2_path=None):
+    def fluidsynth(self, fs=44100, synthesizer=None, sfid=0, sf2_path=None, normalize=True):
         """Synthesize using fluidsynth.
 
         Parameters
@@ -1020,8 +1020,10 @@ class PrettyMIDI(object):
         # Sum all waveforms in
         for waveform in waveforms:
             synthesized[:waveform.shape[0]] += waveform
-        # Normalize
-        synthesized /= np.abs(synthesized).max()
+        # Fluidsynth produces 16-bit integers.
+        synthesized /= (1 << 15)
+        if normalize:
+            synthesized /= np.abs(synthesized).max()
         return synthesized
 
     def tick_to_time(self, tick):
